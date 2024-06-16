@@ -81,6 +81,10 @@ RUN \
     rm -rf /usr/src/confluent-kafka-python
 
 RUN \
+    pip install --upgrade pip && \
+    pip install pydantic_settings
+
+RUN \
     apk del .dev_pkgs
 
 RUN \
