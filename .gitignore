@@ -1,3 +1,5 @@
+.env
+config-kafka.ini
 build
 _build
 build-openssl

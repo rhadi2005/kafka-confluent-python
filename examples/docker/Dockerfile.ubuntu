@@ -26,7 +26,8 @@
 #
 #############################################################################
 
-FROM alpine:3.12
+# FROM alpine:3.12
+FROM ubuntu:22.04
 
 COPY . /usr/src/confluent-kafka-python
 
@@ -39,9 +40,9 @@ ENV BUILD_DEPS git make gcc g++ curl pkgconfig bsd-compat-headers zlib-dev opens
 ENV RUN_DEPS bash libcurl cyrus-sasl-gssapiv2 ca-certificates libsasl heimdal-libs krb5 zstd-libs zstd-static yajl python3 py3-pip
 
 RUN \
-    apk update && \
-    apk add --no-cache --virtual .dev_pkgs $BUILD_DEPS $BUILD_DEPS_EXTRA && \
-    apk add --no-cache $RUN_DEPS $RUN_DEPS_EXTRA
+    apt update && \
+    apt install -y $BUILD_DEPS $BUILD_DEPS_EXTRA && \
+    apt install -y $RUN_DEPS $RUN_DEPS_EXTRA
 
 RUN \
     echo Installing librdkafka && \

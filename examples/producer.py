@@ -19,24 +19,54 @@
 # Example Kafka Producer.
 # Reads lines from stdin and sends to Kafka.
 #
+# python3 producer.py ../kafka-confluent/config-kafka.ini
+#
 
 from confluent_kafka import Producer
 import sys
+import json
+
+from config import settings
+from argparse import ArgumentParser, FileType
+from configparser import ConfigParser
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        sys.stderr.write('Usage: %s <bootstrap-brokers> <topic>\n' % sys.argv[0])
+    # if len(sys.argv) != 3:
+    #     sys.stderr.write('Usage: %s <bootstrap-brokers> <topic>\n' % sys.argv[0])
+    #     sys.exit(1)
+
+    # broker = sys.argv[1]
+    # topic = sys.argv[2]
+
+    if len(sys.argv) != 2:
+        sys.stderr.write('Usage: %s <config file>\n' % sys.argv[0])
         sys.exit(1)
 
-    broker = sys.argv[1]
-    topic = sys.argv[2]
+    parser = ArgumentParser()
+    parser.add_argument('config_file', type=FileType('r'))
+    args = parser.parse_args()
+
+    config_parser = ConfigParser()
+    config_parser.read_file(args.config_file)
+    config = dict(config_parser['default'])
+    config.update(config_parser['producer'])
+    # config["ssl.ca.location"] = certifi.where()
+
+    broker = config['bootstrap.servers']
+    topic = settings.kafka_topic_debug
+
+    print(f"broker: {broker}")
+    print(f"topic: {topic}")
 
     # Producer configuration
     # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-    conf = {'bootstrap.servers': broker}
+    # conf = {'bootstrap.servers': broker}
 
     # Create Producer instance
-    p = Producer(**conf)
+    # p = Producer(**conf)
+    p = Producer(config)
+    p.init_transactions()
+    p.begin_transaction()
 
     # Optional per-message delivery callback (triggered by poll() or flush())
     # when a message has been successfully delivered or permanently
@@ -45,8 +75,12 @@ if __name__ == '__main__':
         if err:
             sys.stderr.write('%% Message failed delivery: %s\n' % err)
         else:
-            sys.stderr.write('%% Message delivered to %s [%d] @ %d\n' %
-                             (msg.topic(), msg.partition(), msg.offset()))
+            # value_json = json.loads(msg.value().decode('utf-8'))
+            # key_json = json.loads(msg.key().decode('utf-8'))
+            value = msg.value()
+
+            sys.stderr.write('%% Message delivered to %s partition [%d] @ offset %d, msg: %s\n' %
+                             (msg.topic(), msg.partition(), msg.offset(), value))
 
     # Read lines from stdin, produce each line to Kafka
     for line in sys.stdin:
@@ -67,3 +101,4 @@ if __name__ == '__main__':
     # Wait until all messages have been delivered
     sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
     p.flush()
+    p.commit_transaction()
