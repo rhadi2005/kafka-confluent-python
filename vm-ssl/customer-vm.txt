@@ -1,0 +1,260 @@
+
+python3 producer.py ../kafka-confluent/config-kafka.ini
+=======================================================
+broker: pkc-12576z.us-west2.gcp.confluent.cloud:9092
+topic: circlebi_debug
+
+%3|1718598973.155|FAIL|rdkafka#producer-1| [thrd:sasl_ssl://pkc-12576z.us-west2.gcp.confluent.cloud:9092/bootstr]: sasl_ssl://pkc-12576z.us-west2.gcp.confluent.cloud:9092/bootstrap: SSL handshake failed: Disconnected: connecting to a PLAINTEXT broker listener? (after 0ms in state SSL_HANDSHAKE)
+%3|1718598973.589|FAIL|rdkafka#producer-1| [thrd:sasl_ssl://pkc-12576z.us-west2.gcp.confluent.cloud:9092/bootstr]: sasl_ssl://pkc-12576z.us-west2.gcp.confluent.cloud:9092/bootstrap: SSL handshake failed: Disconnected: connecting to a PLAINTEXT broker listener? (after 0ms in state SSL_HANDSHAKE, 1 identical error(s) suppressed)
+
+
+
+Host OS
+=======
+cat /etc/os-release
+
+NAME="Red Hat Enterprise Linux"
+VERSION="8.7 (Ootpa)"
+ID="rhel"
+ID_LIKE="fedora"
+VERSION_ID="8.7"
+PLATFORM_ID="platform:el8"
+PRETTY_NAME="Red Hat Enterprise Linux 8.7 (Ootpa)"
+ANSI_COLOR="0;31"
+CPE_NAME="cpe:/o:redhat:enterprise_linux:8::baseos"
+HOME_URL="https://www.redhat.com/"
+DOCUMENTATION_URL="https://access.redhat.com/documentation/red_hat_enterprise_linux/8/"
+BUG_REPORT_URL="https://bugzilla.redhat.com/"
+
+REDHAT_BUGZILLA_PRODUCT="Red Hat Enterprise Linux 8"
+REDHAT_BUGZILLA_PRODUCT_VERSION=8.7
+REDHAT_SUPPORT_PRODUCT="Red Hat Enterprise Linux"
+REDHAT_SUPPORT_PRODUCT_VERSION="8.7"
+
+
+openssl version
+OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)
+
+openssl version -d
+OPENSSLDIR: "/u/WORK/dis/conda-circlebi/ssl"
+
+
+openssl version
+OpenSSL 1.1.1k  FIPS 25 Mar 2021
+
+openssl version -d
+OPENSSLDIR: "/etc/pki/tls"
+
+awk -v decoder='openssl x509 -noout -subject -enddate 2>/dev/null' '
+  /BEGIN/{close(decoder)};{print | decoder}
+' < /etc/pki/tls/cert.pem | grep 'ISRG\|DST'
+
+subject=C = US, O = Internet Security Research Group, CN = ISRG Root X1
+subject=C = US, O = Internet Security Research Group, CN = ISRG Root X2
+
+
+docker --version
+Docker version 26.0.2, build 3c863ff
+
+
+Docker container
+================
+cat /etc/os-release
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.12.12
+PRETTY_NAME="Alpine Linux v3.12"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+
+
+apk list -I | grep openssl
+libssl1.1-1.1.1o-r0 x86_64 {openssl} (OpenSSL) [installed]
+openssl-1.1.1o-r0 x86_64 {openssl} (OpenSSL) [installed]
+libcrypto1.1-1.1.1o-r0 x86_64 {openssl} (OpenSSL) [installed]
+
+
+openssl version
+OpenSSL 1.1.1o  3 May 2022
+
+openssl version -d
+OPENSSLDIR: "/etc/ssl"
+
+
+
+python3 --version
+Python 3.8.10
+
+
+python3 -c 'import ssl; print(ssl.OPENSSL_VERSION)'
+OpenSSL 1.1.1o  3 May 2022
+
+
+python3 -c 'import certifi; print(certifi.where())'
+/usr/lib/python3.8/site-packages/certifi/cacert.pem
+
+
+awk -v decoder='openssl x509 -noout -subject -enddate 2>/dev/null' '
+  /BEGIN/{close(decoder)};{print | decoder}
+' < /etc/ssl/cert.pem | grep 'ISRG\|DST'
+--------------------------------------------------------------------------
+subject=C = US, O = Internet Security Research Group, CN = ISRG Root X1
+subject=C = US, O = Internet Security Research Group, CN = ISRG Root X2
+
+
+awk -v decoder='openssl x509 -noout -subject -enddate 2>/dev/null' '
+  /BEGIN/{close(decoder)};{print | decoder}
+' < /usr/lib/python3.8/site-packages/certifi/cacert.pem | grep 'ISRG\|DST'
+--------------------------------------------------------------------------
+subject=O = Digital Signature Trust Co., CN = DST Root CA X3
+subject=C = US, O = Internet Security Research Group, CN = ISRG Root X1
+
+
+
+===================================================================================
+export BOOTSTRAP=pkc-12576z.us-west2.gcp.confluent.cloud
+echo $BOOTSTRAP
+pkc-12576z.us-west2.gcp.confluent.cloud
+
+openssl s_client -debug -connect $BOOTSTRAP:9092 -servername $BOOTSTRAP -verify_hostname $BOOTSTRAP </dev/null
+CONNECTED(00000003)
+write to 0x5575c92c1d20 [0x5575c93b6600] (341 bytes => 341 (0x155))
+0000 - 16 03 01 01 50 01 00 01-4c 03 03 8c 60 6d e8 06   ....P...L...`m..
+0010 - fb 8a f1 93 63 ae 23 7b-03 6f 08 cc 61 00 78 32   ....c.#{.o..a.x2
+0020 - e6 04 49 ac 06 a5 33 70-cd 03 8e 20 b6 ca b9 a3   ..I...3p... ....
+0030 - 41 17 5a 00 35 fb 28 c3-ec 61 0f b2 d2 55 d4 c3   A.Z.5.(..a...U..
+0040 - c1 6f 68 dd 6b e8 25 77-3e 09 b3 59 00 3e 13 02   .oh.k.%w>..Y.>..
+0050 - 13 03 13 01 c0 2c c0 30-00 9f cc a9 cc a8 cc aa   .....,.0........
+0060 - c0 2b c0 2f 00 9e c0 24-c0 28 00 6b c0 23 c0 27   .+./...$.(.k.#.'
+0070 - 00 67 c0 0a c0 14 00 39-c0 09 c0 13 00 33 00 9d   .g.....9.....3..
+0080 - 00 9c 00 3d 00 3c 00 35-00 2f 00 ff 01 00 00 c5   ...=.<.5./......
+0090 - 00 00 00 2c 00 2a 00 00-27 70 6b 63 2d 31 32 35   ...,.*..'pkc-125
+00a0 - 37 36 7a 2e 75 73 2d 77-65 73 74 32 2e 67 63 70   76z.us-west2.gcp
+00b0 - 2e 63 6f 6e 66 6c 75 65-6e 74 2e 63 6c 6f 75 64   .confluent.cloud
+00c0 - 00 0b 00 04 03 00 01 02-00 0a 00 0c 00 0a 00 1d   ................
+00d0 - 00 17 00 1e 00 19 00 18-00 23 00 00 00 16 00 00   .........#......
+00e0 - 00 17 00 00 00 0d 00 30-00 2e 04 03 05 03 06 03   .......0........
+00f0 - 08 07 08 08 08 09 08 0a-08 0b 08 04 08 05 08 06   ................
+0100 - 04 01 05 01 06 01 03 03-02 03 03 01 02 01 03 02   ................
+0110 - 02 02 04 02 05 02 06 02-00 2b 00 09 08 03 04 03   .........+......
+0120 - 03 03 02 03 01 00 2d 00-02 01 01 00 33 00 26 00   ......-.....3.&.
+0130 - 24 00 1d 00 20 fb f5 ce-e0 a0 cb 9e 56 80 63 2b   $... .......V.c+
+0140 - 64 8d 4e 6c 0f e1 d7 d2-17 ac 07 a8 aa 12 f9 96   d.Nl............
+0150 - d4 27 7d e0 32                                    .'}.2
+read from 0x5575c92c1d20 [0x5575c93ad3a3] (5 bytes => -1 (0xFFFFFFFFFFFFFFFF))
+write:errno=104
+---
+no peer certificate available
+---
+No client certificate CA names sent
+---
+SSL handshake has read 0 bytes and written 341 bytes
+Verification: OK
+---
+New, (NONE), Cipher is (NONE)
+Secure Renegotiation IS NOT supported
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+read from 0x5575c92c1d20 [0x5575c92a0760] (8192 bytes => 0 (0x0))
+
+
+===================================================================================
+
+openssl s_client -debug -connect pkc-12576z.us-west2.gcp.confluent.cloud:443 -servername gcp.confluent.cloud -tls1_2
+--------------------------------------------------------------------------------------------------------------------
+
+openssl s_client -debug -connect pkc-12576z.us-west2.gcp.confluent.cloud:443 -servername gcp.confluent.cloud -tls1_2
+CONNECTED(00000003)
+write to 0x5647d3967240 [0x5647d39c54a0] (222 bytes => 222 (0xDE))
+0000 - 16 03 01 00 d9 01 00 00-d5 03 03 a9 6a 90 c3 20   ............j..
+0010 - a9 6f b7 a0 5c 32 dc fb-43 62 f3 8c 60 ef 52 4a   .o..\2..Cb..`.RJ
+0020 - 62 25 fb 66 40 47 c3 4c-7f f0 2a 00 00 38 c0 2c   b%.f@G.L..*..8.,
+0030 - c0 30 00 9f cc a9 cc a8-cc aa c0 2b c0 2f 00 9e   .0.........+./..
+0040 - c0 24 c0 28 00 6b c0 23-c0 27 00 67 c0 0a c0 14   .$.(.k.#.'.g....
+0050 - 00 39 c0 09 c0 13 00 33-00 9d 00 9c 00 3d 00 3c   .9.....3.....=.<
+0060 - 00 35 00 2f 00 ff 01 00-00 74 00 00 00 18 00 16   .5./.....t......
+0070 - 00 00 13 67 63 70 2e 63-6f 6e 66 6c 75 65 6e 74   ...gcp.confluent
+0080 - 2e 63 6c 6f 75 64 00 0b-00 04 03 00 01 02 00 0a   .cloud..........
+0090 - 00 0c 00 0a 00 1d 00 17-00 1e 00 19 00 18 00 23   ...............#
+00a0 - 00 00 00 16 00 00 00 17-00 00 00 0d 00 30 00 2e   .............0..
+00b0 - 04 03 05 03 06 03 08 07-08 08 08 09 08 0a 08 0b   ................
+00c0 - 08 04 08 05 08 06 04 01-05 01 06 01 03 03 02 03   ................
+00d0 - 03 01 02 01 03 02 02 02-04 02 05 02 06 02         ..............
+read from 0x5647d3967240 [0x5647d39bc243] (5 bytes => -1 (0xFFFFFFFFFFFFFFFF))
+write:errno=104
+---
+no peer certificate available
+---
+No client certificate CA names sent
+---
+SSL handshake has read 0 bytes and written 222 bytes
+Verification: OK
+---
+New, (NONE), Cipher is (NONE)
+Secure Renegotiation IS NOT supported
+No ALPN negotiated
+SSL-Session:
+    Protocol  : TLSv1.2
+    Cipher    : 0000
+    Session-ID:
+    Session-ID-ctx:
+    Master-Key:
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    Start Time: 1718601047
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+---
+read from 0x5647d3967240 [0x5647d38af760] (8192 bytes => 0 (0x0))
+
+
+
+===================================================================================
+
+openssl s_client -debug -connect  www.github.com:443
+----------------------------------------------------
+CONNECTED(00000003)
+write to 0x557a358b7240 [0x557a359154a0] (316 bytes => 316 (0x13C))
+0000 - 16 03 01 01 37 01 00 01-33 03 03 0e d8 d7 43 b0   ....7...3.....C.
+0010 - a9 a3 a5 c1 3d 39 23 31-31 e9 41 9e 05 1f e6 d4   ....=9#11.A.....
+0020 - b5 7d 03 34 21 51 fe 51-9f 48 85 20 47 8c 3e 9f   .}.4!Q.Q.H. G.>.
+0030 - c8 10 6a 3c aa 2c 7a df-9d b1 8f 3a ad 47 fb 90   ..j<.,z....:.G..
+0040 - 86 87 6b 78 c4 4a ea 6c-2c 14 9f 9d 00 3e 13 02   ..kx.J.l,....>..
+0050 - 13 03 13 01 c0 2c c0 30-00 9f cc a9 cc a8 cc aa   .....,.0........
+0060 - c0 2b c0 2f 00 9e c0 24-c0 28 00 6b c0 23 c0 27   .+./...$.(.k.#.'
+0070 - 00 67 c0 0a c0 14 00 39-c0 09 c0 13 00 33 00 9d   .g.....9.....3..
+0080 - 00 9c 00 3d 00 3c 00 35-00 2f 00 ff 01 00 00 ac   ...=.<.5./......
+0090 - 00 00 00 13 00 11 00 00-0e 77 77 77 2e 67 69 74   .........www.git
+00a0 - 68 75 62 2e 63 6f 6d 00-0b 00 04 03 00 01 02 00   hub.com.........
+00b0 - 0a 00 0c 00 0a 00 1d 00-17 00 1e 00 19 00 18 00   ................
+00c0 - 23 00 00 00 16 00 00 00-17 00 00 00 0d 00 30 00   #.............0.
+00d0 - 2e 04 03 05 03 06 03 08-07 08 08 08 09 08 0a 08   ................
+00e0 - 0b 08 04 08 05 08 06 04-01 05 01 06 01 03 03 02   ................
+00f0 - 03 03 01 02 01 03 02 02-02 04 02 05 02 06 02 00   ................
+0100 - 2b 00 09 08 03 04 03 03-03 02 03 01 00 2d 00 02   +............-..
+0110 - 01 01 00 33 00 26 00 24-00 1d 00 20 dc f6 65 dd   ...3.&.$... ..e.
+0120 - 61 d0 9c 60 6a 1e d8 b8-04 b5 cf c6 c9 ff 30 08   a..`j.........0.
+0130 - 2d bd a3 c7 57 61 5d 4a-87 1c e1 3e               -...Wa]J...>
+read from 0x557a358b7240 [0x557a3590c243] (5 bytes => -1 (0xFFFFFFFFFFFFFFFF))
+write:errno=104
+---
+no peer certificate available
+---
+No client certificate CA names sent
+---
+SSL handshake has read 0 bytes and written 316 bytes
+Verification: OK
+---
+New, (NONE), Cipher is (NONE)
+Secure Renegotiation IS NOT supported
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+read from 0x557a358b7240 [0x557a357ff760] (8192 bytes => 0 (0x0))
+
+
